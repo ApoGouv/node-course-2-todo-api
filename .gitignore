@@ -1,0 +1,50 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+### Example user template
+# IntelliJ project files
+.idea
+out
+
+gen### MicrosoftOffice template
+*.tmp
+# Word temporary
+~$*.doc*
+# Word files
+*.docx
+# Excel temporary
+~$*.xls*
+# Excel Backup File
+*.xlk
+# PowerPoint temporary
+~$*.ppt*
+# Visio autosave temporary files
+*.~vsd*
+
+### Windows template
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+# Dump file
+*.stackdump
+# Folder config file
+Desktop.ini
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+# Windows shortcuts
+*.lnk
+
+# Archives
+*.zip
+
+# Node
+node_modules/
+
+# Custom
+*API_KEY.js
+server.log
