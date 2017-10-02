@@ -15,26 +15,51 @@ mongoose.connect('mongodb://localhost:27017/TodoApp');
 // we specify what types the attributes of Todos will have
 var Todo = mongoose.model('Todo', {
     text: {
-        type: String
+        type: String,
+        required: true,
+        minlength: 1,
+        trim: true
     },
     completed: {
-        type: Boolean
+        type: Boolean,
+        default: false
     },
     completedAt: {
-        type: Number
+        type: Number,
+        default: null
     }
 });
 
 // create a newTodo
-var newTodo = new Todo({
-    text: 'Make a pie',
-    completed: true,
-    completedAt: Math.floor(Date.now() / 1000)
-});
+// var newTodo = new Todo({
+//     text: 'Something to do'
+// });
 
 // save it to the db
-newTodo.save().then((doc) => {
-    console.log('Saved todo', doc);
+// newTodo.save().then((doc) => {
+//     console.log('Saved todo', doc);
+// }, (e) => {
+//     console.log('Unable to save Todo', e);
+// });
+
+// User
+// email -require it - trim it - set type - set min length of 1
+var User = mongoose.model('User', {
+    email: {
+        required: true,
+        trim: true,
+        type: String,
+        minlength: 1
+    }
+});
+
+var newUser = new User({
+    email: 'tolios@example.com'
+});
+
+newUser.save().then((doc) => {
+    console.log('User Saved');
+    console.log(JSON.stringify(doc, undefined, 2));
 }, (e) => {
-    console.log('Unable to save Todo', e);
+    console.log('Unable to save new User', e);
 });
