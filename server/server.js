@@ -4,13 +4,13 @@
  * Author  : Apostolos Gouvalas
  * Date    : 2/10/2017
  */
+const _ = require('lodash');
 const express = require('express');
 // takes a JSON and convert it to an object
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 
 const {mongoose} = require('./db/mongoose');
-
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
@@ -72,6 +72,7 @@ app.get('/todos/:id', (req, res) => {
   });
 });
 
+// config DELETE route: /todos/someId
 app.delete('/todos/:id', (req, res) => {
   // get the id
   var id = req.params.id;
@@ -95,6 +96,41 @@ app.delete('/todos/:id', (req, res) => {
     // 400 with empty body
     res.status(400).send();
   });
+});
+
+// config PATCH (UPDATE) route: /todos/someId
+app.patch('/todos/:id', (req, res) => {
+  var id = req.params.id;
+  // _.pick() takes an Object and then an array of properties we want to pull off
+  // with that way, the users will not have access to the _id
+  //    or other properties we don't want them to have access to.
+
+  // This has a subset of the things the user passed to us.
+  var body = _.pick(req.body, ['text', 'completed']);
+
+  if (!ObjectID.isValid(id)){
+    return res.status(404).send();
+  }
+
+  // here we update the completedAt property based on the completed property
+  if (_.isBoolean(body.completed) && body.completed){
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  // call the findByIdAndUpdate()
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    if (!todo){
+        return res.status(404).send();
+    }
+
+    res.send({todo});
+  }).catch((e) => {
+    res.status(400).send();
+  });
+
 });
 
 
