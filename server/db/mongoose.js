@@ -9,9 +9,12 @@ const mongoose = require('mongoose');
 // Configure Mongoose to use promises
 mongoose.Promise = global.Promise;
 // Make a connection to the DB with Mongoose
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp', {
+mongoose.connect(process.env.MONGODB_URI, {
   useMongoClient: true,
   /* other options */
 });
 
 module.exports = {mongoose};
+
+
+// *** process.env.NODE_ENV ***

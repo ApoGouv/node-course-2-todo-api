@@ -4,6 +4,8 @@
  * Author  : Apostolos Gouvalas
  * Date    : 2/10/2017
  */
+require('./config/config');
+
 const _ = require('lodash');
 const express = require('express');
 // takes a JSON and convert it to an object
@@ -15,7 +17,7 @@ const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
 let app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
@@ -77,7 +79,7 @@ app.delete('/todos/:id', (req, res) => {
   // get the id
   var id = req.params.id;
   // validate the id
-  if (!ObjectID.isValid(id)){
+  if (!ObjectID.isValid(id)) {
     // not valid? return 404
     return res.status(404).send();
   }
@@ -85,7 +87,7 @@ app.delete('/todos/:id', (req, res) => {
   // remove todo by id
   Todo.findByIdAndRemove(id).then((todo) => {
     // success
-    if (!todo){
+    if (!todo) {
       // if no doc, send 404
       return res.status(404).send();
     }
@@ -108,12 +110,12 @@ app.patch('/todos/:id', (req, res) => {
   // This has a subset of the things the user passed to us.
   var body = _.pick(req.body, ['text', 'completed']);
 
-  if (!ObjectID.isValid(id)){
+  if (!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
 
   // here we update the completedAt property based on the completed property
-  if (_.isBoolean(body.completed) && body.completed){
+  if (_.isBoolean(body.completed) && body.completed) {
     body.completedAt = new Date().getTime();
   } else {
     body.completed = false;
@@ -122,8 +124,8 @@ app.patch('/todos/:id', (req, res) => {
 
   // call the findByIdAndUpdate()
   Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
-    if (!todo){
-        return res.status(404).send();
+    if (!todo) {
+      return res.status(404).send();
     }
 
     res.send({todo});
