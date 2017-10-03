@@ -15,70 +15,68 @@ const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
 let app = express();
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
 // config POST route: /todos
 // get the body data send by client- we can simulate this with Postman
 app.post('/todos', (req, res) => {
-    //console.log(req.body);
-    // create a new model
-    var todo = new Todo({
-        text: req.body.text
-    });
+  //console.log(req.body);
+  // create a new model
+  var todo = new Todo({
+    text: req.body.text
+  });
 
-    // save the model to the db
-    todo.save().then((doc) => {
-        res.send(doc);
-    }, (e) => {
-        res.status(400).send(e);
-    });
+  // save the model to the db
+  todo.save().then((doc) => {
+    res.send(doc);
+  }, (e) => {
+    res.status(400).send(e);
+  });
 });
 
 
 // config GET route: /todos
 app.get('/todos', (req, res) => {
-   Todo.find().then((todos) => {
-       res.send({todos})
-   }, (e) => {
-       res.status(400).send(e);
-   });
+  Todo.find().then((todos) => {
+    res.send({todos})
+  }, (e) => {
+    res.status(400).send(e);
+  });
 });
 
 // config GET route: /todos/someId
 app.get('/todos/:id', (req, res) => {
-    var id = req.params.id;
+  var id = req.params.id;
 
-    // validate ID using isValid
-    if (!ObjectID.isValid(id)){
-        // 404 - send back empty send
-       return res.status(404).send();
+  // validate ID using isValid
+  if (!ObjectID.isValid(id)) {
+    // 404 - send back empty send
+    return res.status(404).send();
+  }
+
+  // findById
+  Todo.findById(id).then((todo) => {
+    // success
+    if (!todo) {
+      // if no todo - send back 404 - with empty body
+      return res.status(404).send();
     }
-
-    // findById
-    Todo.findById(id).then((todo)=> {
-        // success
-        if (!todo){
-            // if no todo - send back 404 - with empty body
-            return res.status(404).send();
-        }
-        // if todo - send it back
-        res.send({todo});
-    }).catch((e) => {
-        // error
-        // 400 - and send empty body back
-        res.status(400).send();
-    });
-
-
-
+    // if todo - send it back
+    res.send({todo});
+  }).catch((e) => {
+    // error
+    // 400 - and send empty body back
+    res.status(400).send();
+  });
 
 
 });
 
 
-app.listen(3000, () => {
-    console.log('Started on port 3000');
+app.listen(port, () => {
+  console.log(`Started up at port: ${port}`);
 });
 
 
