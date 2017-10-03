@@ -92,7 +92,7 @@ describe('GET /todos', () => {
 describe('GET /todos/:id', () => {
   it('should return todo doc', (done) => {
     request(app)
-      // we use .toHeString() to the id, cause we get an id Object and not String
+    // we use .toHeString() to the id, cause we get an id Object and not String
       .get(`/todos/${todos[0]._id.toHexString()}`)
       .expect(200)
       .expect((res) => {
@@ -103,9 +103,9 @@ describe('GET /todos/:id', () => {
 
   it('should return 404 if todo not found', (done) => {
     // make a new ID, and make sure you get a 404 back
-    var someID = new ObjectID().toHexString();
+    var hexID = new ObjectID().toHexString();
     request(app)
-      .get(`/todos/${someID}`)
+      .get(`/todos/${hexID}`)
       .expect(404)
       .end(done);
   });
@@ -117,5 +117,43 @@ describe('GET /todos/:id', () => {
       .expect(404)
       .end(done);
   });
+});
 
+describe('DELETE /todos/:id', () => {
+  it('should remove a todo', (done) => {
+    var hexID = todos[1]._id.toHexString();
+
+    request(app)
+      .delete(`/todos/${hexID}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo._id).toBe(hexID);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        // query DB using findById
+        // expect(null).toNotExist();
+        Todo.findById(hexID).then((todo) => {
+          expect(todo).toNotExist();
+          done();
+        }).catch((e) => done(e));
+      })
+  });
+
+  it('should return 404 if todo not found', (done) => {
+    var hexID = new ObjectID().toHexString();
+    request(app)
+      .delete(`/todos/${hexID}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 if object id is invalid', (done) => {
+    request(app)
+      .delete('/todos/123abc')
+      .expect(404)
+      .end(done);
+  });
 });
