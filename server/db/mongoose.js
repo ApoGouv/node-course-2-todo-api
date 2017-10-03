@@ -10,8 +10,8 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 // Make a connection to the DB with Mongoose
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp', {
-    useMongoClient: true,
-    /* other options */
+  useMongoClient: true,
+  /* other options */
 });
 
 module.exports = {mongoose};
