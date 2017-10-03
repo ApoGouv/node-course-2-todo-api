@@ -17,12 +17,16 @@ let app = express();
 
 app.use(bodyParser.json());
 
+// config post route: /todos
+// get the body data send by client- we can simulate this with Postman
 app.post('/todos', (req, res) => {
     //console.log(req.body);
+    // create a new model
     var todo = new Todo({
         text: req.body.text
     });
 
+    // save the model to the db
     todo.save().then((doc) => {
         res.send(doc);
     }, (e) => {
@@ -34,3 +38,6 @@ app.post('/todos', (req, res) => {
 app.listen(3000, () => {
     console.log('Started on port 3000');
 });
+
+
+module.exports = {app};
