@@ -11,7 +11,7 @@ const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
 // beforeEach(), describe() and it() come from Mocha!
-// insertMany() comme from Mongoose.
+// insertMany() and Todo.find() comme from Mongoose.
 
 const todos =[{
     text: 'First test todo',
