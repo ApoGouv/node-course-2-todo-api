@@ -19,6 +19,14 @@ const {User} = require('./models/user');
 let app = express();
 const port = process.env.PORT;
 
+// disable the x-powered-by entry in header
+//app.disable('x-powered-by');
+// or set it to a custom one:
+app.use(function (req, res, next) {
+  res.header("X-powered-by", "recursion(coffee && nerves) + code(nodeJS, Express, MongoDB)")
+  next()
+});
+
 app.use(bodyParser.json());
 
 /* *** /todos *** */
@@ -147,8 +155,10 @@ app.post('/users', (req, res) => {
   // create a new User model
   var user = new User(body);
   // save the new model to the DB
-  user.save().then((user_doc) => {
-    res.send(user_doc);
+  user.save().then(() => {
+    return user.generateAuthToken();
+  }).then((token) => {
+    res.header('x-auth', token).send(user);
   }).catch((e) => {
     res.status(400).send(e);
   });
