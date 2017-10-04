@@ -83,6 +83,31 @@ UserSchema.statics.findByToken = function (token) {
   });
 };
 
+UserSchema.statics.findByCredentials = function (email, password) {
+  var User = this;
+
+  return User.findOne({email}).then((user) => {
+    // if user does not exist
+    if (!user){
+        return Promise.reject();
+    }
+
+    // if user exists, compare the password
+    return new Promise((resolve, reject) => {
+      // bcrypt only supports callbacks! that's why we wrap it in a Promise!
+      // make a comparison of the plain pass and the hashed pass
+      bcrypt.compare(password, user.password, (err, res) => {
+        if (res){
+          resolve(user);
+        } else {
+          reject();
+        }
+      });
+    })
+
+  })
+};
+
 // Mongoose Middleware - run a function before (pre) some event (save)
 UserSchema.pre('save', function (next) {
   var user = this;
