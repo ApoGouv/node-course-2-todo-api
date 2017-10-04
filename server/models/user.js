@@ -47,16 +47,41 @@ UserSchema.methods.toJSON = function () {
 
 // Instance methods
 UserSchema.methods.generateAuthToken = function () {
-  var user = this;
+  var user = this; // individual document
   var access = 'auth';
   var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
 
   user.tokens.push({access, token});
 
   return user.save().then(() => {
-    return token;
+    return token; // We can chain a promise to this return
   });
 };
+
+// Model Method
+UserSchema.statics.findByToken = function (token) {
+  var User = this; // model
+  var decoded;
+
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch (e) {
+    // return new Promise((resolve, reject) => {
+    //   reject();
+    // })
+    // same as above but simpler
+    return Promise.reject();
+  }
+
+  // We can chain a promise to this return
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+
+};
+
 
 var User = mongoose.model('User', UserSchema );
 
