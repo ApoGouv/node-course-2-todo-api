@@ -34,11 +34,13 @@ app.use(bodyParser.json());
 
 // config POST route: /todos
 // get the body data send by client- we can simulate this with Postman
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticate, (req, res) => {
   //console.log(req.body);
-  // create a new model
+  // create a new model in connection with the logged in user
   var todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    // set the _creator property to the id of the logged in user
+    _creator: req.user._id
   });
 
   // save the model to the db
@@ -50,8 +52,11 @@ app.post('/todos', (req, res) => {
 });
 
 // config GET route: /todos
-app.get('/todos', (req, res) => {
-  Todo.find().then((todos) => {
+app.get('/todos', authenticate, (req, res) => {
+  // fetch all todos for the currently logged in user
+  Todo.find({
+    _creator: req.user._id
+  }).then((todos) => {
     res.send({todos})
   }, (e) => {
     res.status(400).send(e);
@@ -59,7 +64,7 @@ app.get('/todos', (req, res) => {
 });
 
 // config GET route: /todos/someId
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', authenticate, (req, res) => {
   var id = req.params.id;
 
   // validate ID using isValid
@@ -69,7 +74,10 @@ app.get('/todos/:id', (req, res) => {
   }
 
   // findById
-  Todo.findById(id).then((todo) => {
+  Todo.findOne({
+    _id: id,
+    _creator: req.user._id
+  }).then((todo) => {
     // success
     if (!todo) {
       // if no todo - send back 404 - with empty body
@@ -85,7 +93,7 @@ app.get('/todos/:id', (req, res) => {
 });
 
 // config DELETE route: /todos/someId
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', authenticate, (req, res) => {
   // get the id
   var id = req.params.id;
   // validate the id
@@ -95,7 +103,10 @@ app.delete('/todos/:id', (req, res) => {
   }
 
   // remove todo by id
-  Todo.findByIdAndRemove(id).then((todo) => {
+  Todo.findOneAndRemove({
+    _id: id,
+    _creator: req.user._id
+  }).then((todo) => {
     // success
     if (!todo) {
       // if no doc, send 404
@@ -111,7 +122,7 @@ app.delete('/todos/:id', (req, res) => {
 });
 
 // config PATCH (UPDATE) route: /todos/someId
-app.patch('/todos/:id', (req, res) => {
+app.patch('/todos/:id', authenticate, (req, res) => {
   var id = req.params.id;
   // _.pick() takes an Object and then an array of properties we want to pull off
   // with that way, the users will not have access to the _id
@@ -133,7 +144,7 @@ app.patch('/todos/:id', (req, res) => {
   }
 
   // call the findByIdAndUpdate()
-  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+  Todo.findOneAndUpdate({_id: id, _creator: req.user._id }, {$set: body}, {new: true}).then((todo) => {
     if (!todo) {
       return res.status(404).send();
     }
