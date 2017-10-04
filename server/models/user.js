@@ -60,6 +60,17 @@ UserSchema.methods.generateAuthToken = function () {
   });
 };
 
+UserSchema.methods.removeToken = function (token) {
+  var user = this;
+
+  return user.update({
+    // from MongoDB: $pull: lets you remove items from an array, that match certain criteria
+    $pull: {
+      tokens: {token}
+    }
+  });
+};
+
 // Model Method
 UserSchema.statics.findByToken = function (token) {
   var User = this; // model
