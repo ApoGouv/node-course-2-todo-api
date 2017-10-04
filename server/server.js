@@ -21,6 +21,8 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
+/* *** /todos *** */
+
 // config POST route: /todos
 // get the body data send by client- we can simulate this with Postman
 app.post('/todos', (req, res) => {
@@ -37,7 +39,6 @@ app.post('/todos', (req, res) => {
     res.status(400).send(e);
   });
 });
-
 
 // config GET route: /todos
 app.get('/todos', (req, res) => {
@@ -135,7 +136,26 @@ app.patch('/todos/:id', (req, res) => {
 
 });
 
+/* *** /users *** */
 
+// config POST route: /users
+app.post('/users', (req, res) => {
+
+  // allow only a subset of User model to be accessible by a user
+  var body = _.pick(req.body, ['email', 'password']);
+
+  // create a new User model
+  var user = new User(body);
+  // save the new model to the DB
+  user.save().then((user_doc) => {
+    res.send(user_doc);
+  }).catch((e) => {
+    res.status(400).send(e);
+  });
+
+});
+
+/* *** Listen *** */
 app.listen(port, () => {
   console.log(`Started up at port: ${port}`);
 });
