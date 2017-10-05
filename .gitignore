@@ -48,3 +48,4 @@ node_modules/
 # Custom
 *API_KEY.js
 server.log
+/server/config/config.json
